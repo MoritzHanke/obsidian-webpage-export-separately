@@ -9,6 +9,9 @@ Demo / docs: [docs.obsidianweb.net](https://docs.obsidianweb.net/)
 
 > [!NOTE]  
 > Although the plugin is fully functional it is still under development, so there may be frequent large changes between updates that could effect your workflow! Bugs are also not uncommon, please report anything you find, I am working to make the plugin more stable.
+>
+> Fork Notes:
+> All features i need are currently working. More features (track all/selected markdown documents, disable notification for unexported changes, ...) will probably **not be implemented**.
 
 ## Features:
 - Full text search
@@ -21,7 +24,8 @@ Demo / docs: [docs.obsidianweb.net](https://docs.obsidianweb.net/)
 - Option to export html and dependencies into one single file
 
 Fork:
-- track changes in markdown documents and export them separately into html 
+- track changes in markdown documents and export them separately into html
+- get notification on startup if some modified documents aren't exported
 
 ## Using the Plugin
 Check out the new docs for details on using the plugin:
