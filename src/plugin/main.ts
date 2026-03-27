@@ -154,8 +154,8 @@ export default class HTMLExportPlugin extends Plugin {
 		//-----------------------------------------------------------------------------------------------
 
 		this.addCommand({
-			id: "Export modified markdown Documents (separately)",
-			name: "Export modified markdown Documents (separately)",
+			id: "Export modified markdown documents (separately)",
+			name: "Export modified markdown documents (separately)",
 			callback: () => {
 				this.exportUpdatedMarkdowns();
 			},
@@ -173,7 +173,7 @@ export default class HTMLExportPlugin extends Plugin {
 		this.registerEvent(
 			this.app.workspace.on("file-menu", (menu) => {
 				menu.addItem((item) => {
-					item.setTitle("Export modified markdown Documents (separately)")
+					item.setTitle("Export modified markdown documents (separately)")
 						.setIcon("download")
 						.setSection("export")
 						.onClick(() => {
@@ -289,7 +289,7 @@ export default class HTMLExportPlugin extends Plugin {
 				new Notice("The following markdown documents haven't been exported yet:" +
 					str +
 					"\n\n\n Update all or disregard these changes by running:" +
-					"\n- 'Export modified markdown Documents (separately)'\n" +
+					"\n- 'Export modified markdown documents (separately)'\n" +
 					"\n- 'Disregard modified markdown documents'", 30000);
 			}
 

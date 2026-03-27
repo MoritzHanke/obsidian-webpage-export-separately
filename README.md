@@ -25,13 +25,13 @@ Demo / docs: [docs.obsidianweb.net](https://docs.obsidianweb.net/)
 
 Fork:
 - track changes in markdown documents and export them separately into html
-- get notification on startup if some modified documents aren't exported
+- get notification on startup if some modified documents weren't exported again
 
 ## Using the Plugin
 Check out the new docs for details on using the plugin:
 https://docs.obsidianweb.net/
 
-- Fork adds command `Export modified markdown Documents (separately)` and Buttons with the same name.
+- Fork adds command `Export modified markdown documents (separately)` and Buttons with the same name.
   - the plugin tracks changes in markdown documents
     - tracks changes only for files that are opened in Obsidian. If a document isn't opened in one session, 
 it is no longer tracked until opened again.
