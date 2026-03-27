@@ -1,5 +1,5 @@
 // imports from obsidian API
-import { Notice, Plugin, TFile, TFolder, requestUrl,moment, MarkdownPreviewRenderer, MarkdownPreviewView, MarkdownRenderer, Component} from 'obsidian';
+import { Notice, Plugin, TFile, TFolder, requestUrl,moment, MarkdownPreviewRenderer, MarkdownPreviewView, MarkdownRenderer, Component, FileSystemAdapter} from 'obsidian';
 
 // modules that are part of the plugin
 import { AssetHandler } from 'src/plugin/asset-loaders/asset-handler';
@@ -11,6 +11,7 @@ import { _MarkdownRendererInternal, ExportLog, MarkdownRendererAPI } from 'src/p
 import { DataviewRenderer } from './render-api/dataview-renderer';
 import { Website } from './website/website';
 import { i18n } from './translations/language';
+import Dict = NodeJS.Dict;
 
 
 
@@ -35,6 +36,13 @@ export default class HTMLExportPlugin extends Plugin {
 	public dv = DataviewRenderer;
 	public Website = Website;
 
+	// possible changed documents. check later for changes
+	modifiedMarkdownDocuments:Dict<number> | null = null;
+
+	//dont know how often events are called
+	// --> prevent unnecessary dictionary lookups
+	lastOpenedMarkdownDocument: string = "";
+
 	public async exportDocker() {
 		await HTMLExporter.export(true, undefined, new Path("/output"));
 	}
@@ -58,6 +66,10 @@ export default class HTMLExportPlugin extends Plugin {
 		this.addRibbonIcon("folder-up", i18n.exportAsHTML, () => {
 			HTMLExporter.export(false);
 		});
+
+		this.addRibbonIcon("folder-down", "Export modified markdown Documents (separately)",
+			() => this.exportUpdatedMarkdowns())
+
 
 		// register callback for file rename so we can update the saved files to export
 		this.registerEvent(
@@ -134,6 +146,157 @@ export default class HTMLExportPlugin extends Plugin {
 				});
 			})
 		);
+
+		//-----------------------------------------------------------------------------------------------
+		//-----------------------------------------------------------------------------------------------
+		//-----------------------------------------CUSTOM------------------------------------------------
+		//-----------------------------------------------------------------------------------------------
+		//-----------------------------------------------------------------------------------------------
+
+		this.addCommand({
+			id: "Export modified markdown Documents (separately)",
+			name: "Export modified markdown Documents (separately)",
+			callback: () => {
+				this.exportUpdatedMarkdowns();
+			},
+		});
+
+		this.addCommand({
+			id: "Disregard modified markdown documents",
+			name: "Disregard modified markdown documents",
+			callback: () => {
+				this.modifiedMarkdownDocuments = {};
+				this.detectNewMarkdownFile();
+			},
+		});
+
+		this.registerEvent(
+			this.app.workspace.on("file-menu", (menu) => {
+				menu.addItem((item) => {
+					item.setTitle("Export modified Markdown files")
+						.setIcon("download")
+						.setSection("export")
+						.onClick(() => {
+							this.exportUpdatedMarkdowns();
+						});
+				});
+			})
+		);
+
+		/*this.registerEvent(
+			this.app.workspace.on('quit', (tasks) =>
+			{
+				tasks.add( async () => {
+					await this.saveModifiedMarkdownDocumentsData();
+				})
+			})
+		);*/
+
+		this.registerEvent(this.app.workspace.on("active-leaf-change", () => {this.detectNewMarkdownFile();}));
+		this.registerEvent(this.app.workspace.on("file-open", () => {this.detectNewMarkdownFile();}));
+	}
+
+	async saveModifiedMarkdownDocumentsData(){
+		this.settings.modifiedMarkdownDocumentsSinceExportstr = JSON.stringify(this.modifiedMarkdownDocuments);
+		await SettingsPage.saveSettings();
+	}
+
+	async detectNewMarkdownFile() {
+		const activeFile = this.app.workspace.getActiveFile();
+		if(activeFile !== null
+				&& activeFile.extension == "md"
+				&& activeFile.path != this.lastOpenedMarkdownDocument
+				&& !(activeFile.path in this.getModifiedMarkDownDict())) {
+
+			this.getModifiedMarkDownDict()[activeFile.path] = activeFile.stat.mtime;
+			this.lastOpenedMarkdownDocument = activeFile.path;
+			await this.saveModifiedMarkdownDocumentsData(); //keep data backed up
+		}
+	}
+
+	async exportUpdatedMarkdowns() {
+		let exportedSome = false;
+		for (const filePath in this.modifiedMarkdownDocuments){
+			const oldmTime = this.modifiedMarkdownDocuments[filePath];
+			const newFile = this.app.vault.getFileByPath(filePath);
+			if(newFile !== null && oldmTime !== undefined
+				&& newFile.stat.mtime > oldmTime){
+
+				const oldSiteName = this.settings.exportOptions.siteName;
+				const oldPath = this.settings.exportOptions.exportPath;
+
+				let path = newFile.parent?.path;
+				if (path === undefined) path = "";
+
+				const adapter = this.app.vault.adapter;
+				if (adapter instanceof FileSystemAdapter) {
+					path = adapter.getFullPath(path);
+				}
+
+				this.settings.exportOptions.exportPath = path;
+
+				this.settings.exportOptions.siteName = newFile.basename;
+				await SettingsPage.saveSettings();
+				await SettingsPage.loadSettings();
+				await HTMLExporter.export(true, [newFile]);
+
+				this.settings.exportOptions.siteName = oldSiteName;
+				this.settings.exportOptions.exportPath = oldPath;
+				await SettingsPage.saveSettings();
+				await SettingsPage.loadSettings();
+
+				exportedSome = true;
+			}
+		}
+
+		if(!exportedSome) {
+			new Notice("No changes detected (or made when this extension wasn't running).", 10000);
+		}
+
+		this.lastOpenedMarkdownDocument = "";
+		this.modifiedMarkdownDocuments = {};
+		await this.detectNewMarkdownFile();
+	}
+
+	getModifiedMarkDownDict(){
+		if (this.modifiedMarkdownDocuments !== null) {
+			return this.modifiedMarkdownDocuments;
+		}
+		// load modified markdown files
+		this.modifiedMarkdownDocuments = {};
+		try {
+			const dict:Dict<number> = JSON.parse(this.settings.modifiedMarkdownDocumentsSinceExportstr);
+			// remove files that havent been changed since
+			for (const filePath in dict) {
+				const oldmTime = dict[filePath];
+
+				const newFile = this.app.vault.getFileByPath(filePath);
+				if (newFile !== null && oldmTime !== undefined) {
+					if ( newFile.stat.mtime > oldmTime){
+						this.modifiedMarkdownDocuments[filePath] = oldmTime;
+					}
+				}
+			}
+
+			//notify user
+			const toExport = Object.keys(this.modifiedMarkdownDocuments);
+			if (toExport.length > 0){
+				let str = "";
+				for (const i in toExport) {
+					str += "\n- " + toExport[i];
+				}
+
+				new Notice("The following markdown documents haven't been exported yet:" +
+					str +
+					"\n\n\n Update all or disregard these changes by running:" +
+					"\n- 'Export modified markdown Documents (separately)'\n" +
+					"\n- 'Disregard modified markdown documents'", 30000);
+			}
+
+		}catch (e){
+			new Notice(e.toLocaleString(), 30000);
+		}
+		return this.modifiedMarkdownDocuments;
 	}
 
 	async checkForUpdates(): Promise<{

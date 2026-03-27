@@ -1,4 +1,4 @@
-import { Notice, Plugin, PluginSettingTab, Setting, TFile, TFolder, getIcon } from 'obsidian';
+import {Notice, Plugin, PluginSettingTab, Setting, TFile, TFolder, getIcon, FileStats} from 'obsidian';
 import { Path } from 'src/plugin/utils/path';
 import pluginStylesBlacklist from 'src/assets/third-party-styles-blacklist.txt';
 import { ExportLog } from 'src/plugin/render-api/render-api';
@@ -12,6 +12,7 @@ import supportedStyleIds from "src/assets/plugin-style-ids.json";
 import { SupportedPluginStyles } from '../asset-loaders/supported-plugin-styles';
 import postcss from 'postcss';
 import safeParser from 'postcss-safe-parser';
+import Dict = NodeJS.Dict;
 
 // #region Settings Definition
 
@@ -48,6 +49,7 @@ export class Settings
 	// Graph View Settings
 	public static filePickerBlacklist: string[] = ["(^|\\/)node_modules\\/","(^|\\/)dist\\/","(^|\\/)dist-ssr\\/","(^|\\/)\\.vscode\\/"]; // ignore node_modules, dist, and .vscode
 	public static filePickerWhitelist: string[] = ["\\.\\w+$"]; // only include files with extensions
+	public static modifiedMarkdownDocumentsSinceExportstr:string = "";
 
 	public static async onlinePreset()
 	{
