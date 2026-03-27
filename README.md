@@ -20,29 +20,47 @@ Demo / docs: [docs.obsidianweb.net](https://docs.obsidianweb.net/)
 - Most plugins supported (dataview, tasks, etc...)
 - Option to export html and dependencies into one single file
 
+Fork:
+- track changes in markdown documents and export them separately into html 
+
 ## Using the Plugin
 Check out the new docs for details on using the plugin:
 https://docs.obsidianweb.net/
 
+- Fork adds command `Export modified markdown Documents (separately)` and Buttons with the same name.
+  - the plugin tracks changes in markdown documents
+    - tracks changes only for files that are opened in Obsidian. If a document isn't opened in one session, 
+it is no longer tracked until opened again.
+  - Command exports every document separately ( .html file is in the
+same folder and has the same name as the markdown file)
+  - tracked changes can be disregarded with the `Disregard modified markdown documents`-command
+
+
 ## Installation
 
-Install from Obsidian Community Plugins: [Open in Obsidian](https://obsidian.md/plugins?id=webpage-html-export)
+~~Install from Obsidian Community Plugins: [Open in Obsidian](https://obsidian.md/plugins?id=webpage-html-export)~~
+
+- Download `main.js`, `manifest.json` and `styles.css` into folder `path2urVault/.obsidian/plugins/obsidian-webpage-export-separately`
+- run Obsidian and activate the plugin
+
 
 ### Manual Installation
 
-1. Download the `.zip` file from the [Latest Release](https://github.com/KosmosisDire/obsidian-webpage-export/releases/latest), or from any other release version.
-2. Unzip into: `{VaultFolder}/.obsidian/plugins/`
-3. Reload obsidian
+1. ~~Download the `.zip` file from the [Latest Release](https://github.com/KosmosisDire/obsidian-webpage-export/releases/latest), or from any other release version.~~
+2. ~~Unzip into: `{VaultFolder}/.obsidian/plugins/`~~
+3. ~~Reload obsidian~~
+
+see [Build the plugin](https://docs.obsidian.md/Plugins/Getting+started/Build+a+plugin)
 
 ### Beta Installation
 
 Either follow the instructions above for a beta release, or:
 
-1. Install the [BRAT plugin](https://obsidian.md/plugins?id=obsidian42-brat)
-2. Open the brat settings
-3. Select add beta plugin
-4. Enter `https://github.com/KosmosisDire/obsidian-webpage-export` as the repository.
-5. Select Add Plugin
+1. ~~Install the [BRAT plugin](https://obsidian.md/plugins?id=obsidian42-brat)~~
+2. ~~Open the brat settings~~
+3. ~~Select add beta plugin~~
+4. ~~Enter `https://github.com/KosmosisDire/obsidian-webpage-export` as the repository.~~
+5. ~~Select Add Plugin~~
 
 ## Contributing
 

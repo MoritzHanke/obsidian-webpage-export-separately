@@ -173,7 +173,7 @@ export default class HTMLExportPlugin extends Plugin {
 		this.registerEvent(
 			this.app.workspace.on("file-menu", (menu) => {
 				menu.addItem((item) => {
-					item.setTitle("Export modified Markdown files")
+					item.setTitle("Export modified markdown Documents (separately)")
 						.setIcon("download")
 						.setSection("export")
 						.onClick(() => {
@@ -250,7 +250,7 @@ export default class HTMLExportPlugin extends Plugin {
 		}
 
 		if(!exportedSome) {
-			new Notice("No changes detected (or made when this extension wasn't running).", 10000);
+			new Notice("No changes detected.", 10000);
 		}
 
 		this.lastOpenedMarkdownDocument = "";

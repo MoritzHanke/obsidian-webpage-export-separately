@@ -1,9 +1,9 @@
 {
-	"id": "webpage-html-export",
-	"name": "Webpage HTML Export",
+	"id": "webpage-html-export-separately",
+	"name": "Webpage HTML Export (Separately)",
 	"version": "1.9.2",
 	"minAppVersion": "1.6.0",
-	"description": "Export html from single files, canvas pages, or whole vaults. Direct access to the exported HTML files allows you to publish your digital garden anywhere. Focuses on flexibility, features, and style parity.",
+	"description": "Export html from single files, canvas pages, or whole vaults. Direct access to the exported HTML files allows you to publish your digital garden anywhere. Focuses on flexibility, features, and style parity. \n\n Fork tracks opened markdown files for changes and allows user to export (to html) them all seperately",
 	"author": "Nathan George",
 	"authorUrl": "https://github.com/KosmosisDire/obsidian-webpage-export",
 	"isDesktopOnly": true,
