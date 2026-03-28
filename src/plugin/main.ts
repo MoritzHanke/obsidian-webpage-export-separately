@@ -67,7 +67,7 @@ export default class HTMLExportPlugin extends Plugin {
 			HTMLExporter.export(false);
 		});
 
-		this.addRibbonIcon("folder-down", "Export modified markdown Documents (separately)",
+		this.addRibbonIcon("folder-down", "Export modified Markdown Documents (separately)",
 			() => this.exportUpdatedMarkdowns())
 
 
@@ -154,16 +154,16 @@ export default class HTMLExportPlugin extends Plugin {
 		//-----------------------------------------------------------------------------------------------
 
 		this.addCommand({
-			id: "Export modified markdown documents (separately)",
-			name: "Export modified markdown documents (separately)",
+			id: "Export modified Markdown documents (separately)",
+			name: "Export modified Markdown documents (separately)",
 			callback: () => {
 				this.exportUpdatedMarkdowns();
 			},
 		});
 
 		this.addCommand({
-			id: "Disregard modified markdown documents",
-			name: "Disregard modified markdown documents",
+			id: "Disregard modified Markdown documents",
+			name: "Disregard modified Markdown documents",
 			callback: () => {
 				this.modifiedMarkdownDocuments = {};
 				this.detectNewMarkdownFile();
@@ -173,7 +173,7 @@ export default class HTMLExportPlugin extends Plugin {
 		this.registerEvent(
 			this.app.workspace.on("file-menu", (menu) => {
 				menu.addItem((item) => {
-					item.setTitle("Export modified markdown documents (separately)")
+					item.setTitle("Export modified Markdown documents (separately)")
 						.setIcon("download")
 						.setSection("export")
 						.onClick(() => {
@@ -258,43 +258,46 @@ export default class HTMLExportPlugin extends Plugin {
 		await this.detectNewMarkdownFile();
 	}
 
-	getModifiedMarkDownDict(){
+	getModifiedMarkDownDict():Dict<number>{
 		if (this.modifiedMarkdownDocuments !== null) {
 			return this.modifiedMarkdownDocuments;
 		}
-		// load modified markdown files
-		this.modifiedMarkdownDocuments = {};
+		// load modified Markdown files
 		try {
-			const dict:Dict<number> = JSON.parse(this.settings.modifiedMarkdownDocumentsSinceExportstr);
-			// remove files that havent been changed since
-			for (const filePath in dict) {
-				const oldmTime = dict[filePath];
+			this.modifiedMarkdownDocuments = JSON.parse(this.settings.modifiedMarkdownDocumentsSinceExportstr);
+			if (this.modifiedMarkdownDocuments === null) this.modifiedMarkdownDocuments = {};
+
+			// detect modified files
+			const modifiedFilesDict:Dict<number> = {};
+			for (const filePath in this.modifiedMarkdownDocuments) {
+				const oldmTime = this.modifiedMarkdownDocuments[filePath];
 
 				const newFile = this.app.vault.getFileByPath(filePath);
 				if (newFile !== null && oldmTime !== undefined) {
 					if ( newFile.stat.mtime > oldmTime){
-						this.modifiedMarkdownDocuments[filePath] = oldmTime;
+						modifiedFilesDict[filePath] = oldmTime;
 					}
 				}
 			}
 
 			//notify user
-			const toExport = Object.keys(this.modifiedMarkdownDocuments);
-			if (toExport.length > 0){
+			const modifiedFiles = Object.keys(modifiedFilesDict);
+			if (modifiedFiles.length > 0){
 				let str = "";
-				for (const i in toExport) {
-					str += "\n- " + toExport[i];
+				for (const i in modifiedFiles) {
+					str += "\n- " + modifiedFiles[i];
 				}
 
-				new Notice("The following markdown documents haven't been exported yet:" +
+				new Notice("The following Markdown documents haven't been exported yet:\n" +
 					str +
-					"\n\n\n Update all or disregard these changes by running:" +
-					"\n- 'Export modified markdown documents (separately)'\n" +
-					"\n- 'Disregard modified markdown documents'", 30000);
+					"\n\n\n Export all or disregard these changes by running:" +
+					"\n- 'Export modified Markdown documents (separately)' or" +
+					"\n- 'Disregard modified Markdown documents'", 30000);
 			}
 
 		}catch (e){
 			new Notice(e.toLocaleString(), 30000);
+			this.modifiedMarkdownDocuments = {};
 		}
 		return this.modifiedMarkdownDocuments;
 	}

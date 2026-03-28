@@ -11,7 +11,7 @@ Demo / docs: [docs.obsidianweb.net](https://docs.obsidianweb.net/)
 > Although the plugin is fully functional it is still under development, so there may be frequent large changes between updates that could effect your workflow! Bugs are also not uncommon, please report anything you find, I am working to make the plugin more stable.
 >
 > Fork Notes:
-> All features i need are currently working. More features (track all/selected markdown documents, disable notification for unexported changes, ...) will probably **not be implemented**.
+> All features i need are currently working. More features (track all/selected Markdown documents, disable notification for unexported changes, ...) will probably **not be implemented**.
 
 ## Features:
 - Full text search
@@ -24,20 +24,20 @@ Demo / docs: [docs.obsidianweb.net](https://docs.obsidianweb.net/)
 - Option to export html and dependencies into one single file
 
 Fork:
-- track changes in markdown documents and export them separately into html
+- track changes in Markdown documents and export them separately into html
 - get notification on startup if some modified documents weren't exported again
 
 ## Using the Plugin
 Check out the new docs for details on using the plugin:
 https://docs.obsidianweb.net/
 
-- Fork adds command `Export modified markdown documents (separately)` and Buttons with the same name.
-  - the plugin tracks changes in markdown documents
-    - tracks changes only for files that are opened in Obsidian. If a document isn't opened in one session, 
-it is no longer tracked until opened again.
-  - Command exports every document separately ( .html file is in the
-same folder and has the same name as the markdown file)
-  - tracked changes can be disregarded with the `Disregard modified markdown documents`-command
+- Fork adds command `Export modified Markdown documents (separately)` and Buttons with the same name and function.
+  - the plugin tracks changes in Markdown documents
+    - when a Markdown file gets opened, it is tracked for changes until the command is run/button is pressed
+    - tracks changes made by programs other than Obsidian
+  - Command exports modified Markdown documents separately ( .html file is in the
+same folder and has the same name as the Markdown file)
+  - changes in the files can be disregarded with the `Disregard modified Markdown documents`-command. This clears the list of tracked documents.
 
 
 ## Installation
