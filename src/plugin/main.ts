@@ -234,16 +234,11 @@ export default class HTMLExportPlugin extends Plugin {
 				}
 
 				this.settings.exportOptions.exportPath = path;
-
 				this.settings.exportOptions.siteName = newFile.basename;
-				await SettingsPage.saveSettings();
-				await SettingsPage.loadSettings();
 				await HTMLExporter.export(true, [newFile]);
 
 				this.settings.exportOptions.siteName = oldSiteName;
 				this.settings.exportOptions.exportPath = oldPath;
-				await SettingsPage.saveSettings();
-				await SettingsPage.loadSettings();
 
 				exportedSome = true;
 			}
