@@ -233,8 +233,12 @@ export default class HTMLExportPlugin extends Plugin {
 					path = adapter.getFullPath(path);
 				}
 
+				const oldOpenAfterExport = this.settings.openAfterExport;
+				this.settings.openAfterExport = false;
 				this.settings.exportOptions.exportPath = path;
 				this.settings.exportOptions.siteName = newFile.basename;
+				await HTMLExporter.export(true, [newFile]);
+				this.settings.openAfterExport = oldOpenAfterExport;
 				await HTMLExporter.export(true, [newFile]);
 
 				this.settings.exportOptions.siteName = oldSiteName;
