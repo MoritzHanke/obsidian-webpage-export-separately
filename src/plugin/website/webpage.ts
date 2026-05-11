@@ -758,12 +758,18 @@ export class Webpage extends Attachment
 		const elements = Array.from(this.pageDocument.querySelectorAll("[src]:not(head [src])"))
 		for (const mediaEl of elements)
 		{
+			//for some fucking reason the span-container contains also a src field that gets the whole fucking image...
+			//replace the sry only for media files
+			if (!["img", "video", "audio", "embed", "source", "iframe", "input", "track"].contains(mediaEl.tagName.toLowerCase())){
+				continue;
+			}
+
 			const rawSrc = mediaEl.getAttribute("src") ?? "";
 			const filePath = this.website.getFilePathFromSrc(rawSrc, this.source.path);
 			if (filePath.isEmpty || filePath.isDirectory || filePath.isAbsolute) continue;
 
-			const base64 = await filePath.readAsString("base64");
-			if (!base64) return;
+			// const base64 = await filePath.readAsString("base64");
+			// if (!base64) return;
 
 			let ext = filePath.extensionName;
 
@@ -772,7 +778,55 @@ export class Webpage extends Attachment
 
 			if(ext === "svg") ext += "+xml";
 			
-			mediaEl.setAttribute("src", `data:${type}/${ext};base64,${base64}`);
+			// mediaEl.setAttribute("src", `data:${type}/${ext};base64,${base64}`);
+			//mediaEl.setAttribute("src", ``);
+
+			const clean_str = ((mediaPathStr:string)=> {
+				if (mediaPathStr.startsWith("data:")) return undefined;
+				const hasMedia = mediaPathStr.length > 0;
+				if (!hasMedia) return undefined;
+
+				if (!mediaPathStr.startsWith("http") && !mediaPathStr.startsWith("data:"))
+				{
+					// Use getFilePathFromSrc to properly resolve app:// URLs and other paths
+					const resolvedPath = this.website.getFilePathFromSrc(mediaPathStr, this.source.path);
+					const attachment = this.website.index.getFile(resolvedPath.pathname, true);
+
+					if (attachment) {
+						mediaPathStr = attachment.targetPath.path;
+					} else {
+						// Fallback to resolved path if attachment not found
+						mediaPathStr = resolvedPath.path;
+					}
+
+					const mediaPath = Path.joinStrings(this.exportOptions.rssOptions.siteUrl ?? "", mediaPathStr);
+					mediaPathStr = mediaPath.path;
+				}
+
+				return mediaPathStr;
+			})
+
+			//dont store the image... load it dynamically from the data section at the beginning of the document
+			const load_img_script = document.createElement("script");
+			load_img_script.textContent="\
+				(() => {\
+				let img = document.currentScript.parentElement.querySelector(\"img\"); \
+				let data = ObsidianSite.getWebpageData(\"" + clean_str(rawSrc) + "\").data;\
+				img.src = `data:" + type + "/"+ext+ ";base64,`+data; \
+				})();";
+				/*
+				console.log(\"filepath:\""+ filePath+");\
+				console.log(\"img:\" + img);\
+				console.log(\"img-src:\" + img.src);\
+				console.log(\"filepath:\""+ rawSrc+");\
+				console.log(\"filepath:\""+ filePath.path+");\
+				console.log(\"data:\" + data);*/
+
+
+			// document.body.appendChild(Notice.container);
+
+			mediaEl.parentElement?.appendChild(load_img_script)
+
 		};
 	}
 
