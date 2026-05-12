@@ -377,6 +377,17 @@ export class ObsidianWebsite {
 			}
 		}, 100); // Small delay to ensure the DOM is updated
 
+		//console.log("test");
+		document.getElementsByName("load_media").forEach((v, k, p) => {
+			//console.log(v)
+			let a = v.getAttribute("src");
+			let src_base = v.getAttribute("src_base");
+			if(a && src_base){
+				let data = ObsidianSite.getWebpageData(a)?.data;
+				v.setAttribute("src", src_base + data)
+			}
+		})
+
 		return page;
 	}
 

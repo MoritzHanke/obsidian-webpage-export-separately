@@ -777,7 +777,9 @@ export class Webpage extends Attachment
 			const type = app.viewRegistry.typeByExtension[ext] ?? "audio";
 
 			if(ext === "svg") ext += "+xml";
-			
+
+			mediaEl.setAttribute("name", "load_media")
+			mediaEl.setAttribute("src_base", `data:${type}/${ext};base64,`);
 			// mediaEl.setAttribute("src", `data:${type}/${ext};base64,${base64}`);
 			//mediaEl.setAttribute("src", ``);
 
@@ -810,7 +812,7 @@ export class Webpage extends Attachment
 			const load_img_script = document.createElement("script");
 			load_img_script.textContent="\
 				(() => {\
-				let img = document.currentScript.parentElement.querySelector(\"img\"); \
+				let img = document.currentScript.parentElement.querySelector(\"" + mediaEl.tagName.toLowerCase() + "\"); \
 				let data = ObsidianSite.getWebpageData(\"" + clean_str(rawSrc) + "\").data;\
 				img.src = `data:" + type + "/"+ext+ ";base64,`+data; \
 				})();";
